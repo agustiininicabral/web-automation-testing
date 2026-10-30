@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo Storefront</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+    .controls { display: flex; gap: 1rem; margin: 1rem 0; }
+    #products { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    [data-testid="product-card"] { border: 1px solid #bbb; border-radius: 8px; padding: 1rem; }
+    button, input, select { padding: .55rem; }
+    #empty-state { display: none; }
+    #checkout-status { margin-top: .75rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Demo Storefront</h1>
+    <p>Cart: <span id="cart-count" aria-live="polite">0</span> items</p>
+  </header>
+  <main>
+    <section aria-label="Product filters">
+      <div class="controls">
+        <label for="product-search">Search products</label>
+        <input id="product-search" type="search" placeholder="Search by name">
+        <label for="category-filter">Category</label>
+        <select id="category-filter">
+          <option value="all">All categories</option>
+          <option value="electronics">Electronics</option>
+          <option value="home">Home</option>
+          <option value="books">Books</option>
+        </select>
+      </div>
+    </section>
+    <section id="products" aria-label="Products">
+      <article data-testid="product-card" data-name="Laptop Pro" data-category="electronics">
+        <h2>Laptop Pro</h2><p>$1200</p><button class="add-to-cart" type="button">Add to cart</button>
+      </article>
+      <article data-testid="product-card" data-name="Wireless Mouse" data-category="electronics">
+        <h2>Wireless Mouse</h2><p>$35</p><button class="add-to-cart" type="button">Add to cart</button>
+      </article>
+      <article data-testid="product-card" data-name="Desk Lamp" data-category="home">
+        <h2>Desk Lamp</h2><p>$45</p><button class="add-to-cart" type="button">Add to cart</button>
+      </article>
+      <article data-testid="product-card" data-name="SQL Handbook" data-category="books">
+        <h2>SQL Handbook</h2><p>$28</p><button class="add-to-cart" type="button">Add to cart</button>
+      </article>
+    </section>
+    <p id="empty-state" role="status">No products found.</p>
+    <section aria-labelledby="checkout-heading">
+      <h2 id="checkout-heading">Checkout</h2>
+      <form id="checkout-form">
+        <label for="checkout-email">Email address</label>
+        <input id="checkout-email" type="email" required>
+        <button type="submit">Place order</button>
+      </form>
+      <p id="checkout-status" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <script>
+    const search = document.getElementById("product-search");
+    const category = document.getElementById("category-filter");
+    const cards = [...document.querySelectorAll("[data-testid='product-card']")];
+    const empty = document.getElementById("empty-state");
+    function filterProducts() {
+      const term = search.value.trim().toLowerCase();
+      let visible = 0;
+      cards.forEach(card => {
+        const matches = card.dataset.name.toLowerCase().includes(term)
+          && (category.value === "all" || card.dataset.category === category.value);
+        card.hidden = !matches;
+        if (matches) visible += 1;
+      });
+      empty.style.display = visible ? "none" : "block";
+    }
+    search.addEventListener("input", filterProducts);
+    category.addEventListener("change", filterProducts);
+    let cart = 0;
+    document.querySelectorAll(".add-to-cart").forEach(button => {
+      button.addEventListener("click", () => {
+        cart += 1;
+        document.getElementById("cart-count").textContent = String(cart);
+      });
+    });
+    document.getElementById("checkout-form").addEventListener("submit", event => {
+      event.preventDefault();
+      document.getElementById("checkout-status").textContent = "Order placed successfully.";
+    });
+  </script>
+</body>
+</html>
