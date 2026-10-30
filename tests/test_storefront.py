@@ -34,8 +34,10 @@ def test_add_to_cart_updates_live_count(store_page):
 def test_checkout_requires_email_and_confirms_valid_submission(store_page):
     assert store_page.checkout_email_is_required()
     store_page.checkout("")
+    assert not store_page.checkout_email_is_valid()
     assert store_page.checkout_status == ""
     store_page.checkout("customer@example.test")
+    assert store_page.checkout_email_is_valid()
     assert store_page.checkout_status == "Order placed successfully."
 
 
