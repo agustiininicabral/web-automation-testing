@@ -1,50 +1,52 @@
 # Web Automation Testing Framework
 
-A browser-based functional and regression testing project built with Selenium, pytest and the Page Object Model. It tests a small accessible demo storefront in a real headless Chromium browser.
+A browser-based functional and regression testing project built with Selenium, Playwright, pytest and the Page Object Model. It tests a self-contained demo storefront in real Chromium browsers.
 
 ## What it demonstrates
 
 - Selenium WebDriver setup and deterministic browser lifecycle.
 - Page Object Model with reusable locators and actions.
-- Functional tests for search, category filters, cart updates and checkout validation.
-- Assertions on visible content, empty states and accessible labels.
+- Functional and regression scenarios for search, category filters, cart updates, checkout and accessibility labels.
+- A separate Playwright Chromium E2E smoke test for rendering, search and checkout.
 - Headless Chrome execution in GitHub Actions across Python 3.11–3.13.
+- Playwright Chromium execution in a dedicated CI job.
 - No external website dependency: tests run against a local HTML fixture.
 
 ## Run locally
-
-Install Google Chrome, then:
 
 ```bash
 python -m venv .venv
 # Windows: .venv\Scripts\activate
 # macOS/Linux: source .venv/bin/activate
 pip install -e ".[dev]"
+python -m playwright install chromium
 pytest
 ```
 
-Selenium Manager resolves a compatible ChromeDriver. On CI, the workflow provisions Chrome before running the suite.
+Selenium Manager resolves a compatible ChromeDriver. Playwright installs its own Chromium browser. Both suites use the same local fixture.
 
 ## Test scenarios
 
-1. Storefront loads with the expected page title and products.
-2. Search filters products and displays an empty state for no matches.
-3. Category filtering works and can be reset.
+1. Storefront renders the expected title and products.
+2. Search filters products and displays an empty state.
+3. Category filtering works and combines with search.
 4. Adding products updates the cart count.
-5. Checkout requires a valid email and displays a confirmation after submission.
+5. Checkout rejects invalid/empty email and confirms valid submission.
 6. Form controls expose accessible labels.
+7. Playwright independently verifies browser rendering, search and checkout.
 
 ## Structure
 
-- `tests/assets/storefront.html`: self-contained demo web app used as the test target.
-- `src/web_automation/pages/store_page.py`: Page Object Model.
-- `tests/conftest.py`: browser fixture and teardown.
-- `tests/test_storefront.py`: functional regression tests.
-- `.github/workflows/ci.yml`: browser-based CI matrix.
+- `tests/assets/storefront.html`: self-contained demo app.
+- `src/web_automation/pages/store_page.py`: Selenium Page Object Model.
+- `tests/test_storefront.py`: Selenium functional/regression suite.
+- `tests/test_playwright_smoke.py`: Playwright E2E smoke.
+- `PLAYWRIGHT.md`: separate setup instructions.
+- `.github/workflows/ci.yml`: Selenium matrix and Playwright CI.
 
 ## Limitations
 
-The demo app is a local test fixture, not a production commerce application. The suite demonstrates browser automation patterns; selectors and test data would be adapted to the real application under test.
+The demo app is a local test fixture, not a production commerce application. The suite demonstrates browser automation patterns; selectors and test data must be adapted to the real application under test. Tests do not claim to validate a live third-party site.
 
 ## License
 
