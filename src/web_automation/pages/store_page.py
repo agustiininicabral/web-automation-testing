@@ -65,9 +65,10 @@ class StorePage:
 
     @property
     def checkout_status(self) -> str:
-        return self.wait.until(
-            EC.visibility_of_element_located(self.CHECKOUT_STATUS)
-        ).text
+        return self.driver.find_element(*self.CHECKOUT_STATUS).text
 
     def checkout_email_is_required(self) -> bool:
         return self.driver.find_element(*self.CHECKOUT_EMAIL).get_attribute("required") is not None
+
+    def checkout_email_is_valid(self) -> bool:
+        return self.driver.find_element(*self.CHECKOUT_EMAIL).get_property("validity").get("valid", False)
